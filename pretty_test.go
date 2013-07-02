@@ -4,11 +4,10 @@ import "testing"
 
 type Bag map[string]interface{}
 
-func TestPrettyPrint(test *testing.T) {
+var (
+	ch chan string
 
-	var ch chan string
-
-	bag := Bag{
+	bag = Bag{
 		"a": 1,
 		"b": false,
 		"c": "some stuff",
@@ -21,7 +20,13 @@ func TestPrettyPrint(test *testing.T) {
 		"bad": ch,
 	}
 
-	arry := []Bag{bag, bag, bag}
+	arry = []Bag{bag, bag, bag}
+)
 
+func TestPrettyPrint(test *testing.T) {
 	PrettyPrint(arry)
+}
+
+func TestPrettyFormat(test *testing.T) {
+	test.Log(PrettyFormat(bag))
 }

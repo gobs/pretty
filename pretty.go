@@ -1,9 +1,10 @@
 /*
  Pretty-print Go data structures
- */
+*/
 package pretty
 
 import (
+	"bytes"
 	"io"
 	"os"
 	r "reflect"
@@ -29,6 +30,13 @@ type Pretty struct {
 // pretty print the input value (to stdout)
 func PrettyPrint(i interface{}) {
 	PrettyPrintTo(os.Stdout, i)
+}
+
+// pretty print the input value (to a string)
+func PrettyFormat(i interface{}) string {
+	var out bytes.Buffer
+	PrettyPrintTo(&out, i)
+	return out.String()
 }
 
 // pretty print the input value (to specified writer)
