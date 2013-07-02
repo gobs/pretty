@@ -1,74 +1,113 @@
+/*
+ Pretty-print Go data structures
+ */
 package pretty
 
 import (
-	"fmt"
+	"io"
+	"os"
 	r "reflect"
+	"strconv"
 	"strings"
 )
 
-func PrettyPrint(i interface{}) {
-	PrettyPrintValue(r.ValueOf(i), 0)
-	fmt.Println()
+const (
+	DEFAULT_INDENT = "  "
+	DEFAULT_NIL    = "nil"
+)
+
+// The context for printing
+type Pretty struct {
+	// indent string
+	Indent string
+	// output recipient
+	Out io.Writer
+	// string for nil
+	NilString string
 }
 
-func PrettyPrintValue(val r.Value, indent int) {
-	spaces := strings.Repeat("  ", indent)
+// pretty print the input value (to stdout)
+func PrettyPrint(i interface{}) {
+	PrettyPrintTo(os.Stdout, i)
+}
 
+// pretty print the input value (to specified writer)
+func PrettyPrintTo(out io.Writer, i interface{}) {
+	p := &Pretty{DEFAULT_INDENT, out, DEFAULT_NIL}
+	p.Print(i)
+}
+
+// pretty print the input value
+func (p *Pretty) Print(i interface{}) {
+	p.PrintValue(r.ValueOf(i), 0)
+	io.WriteString(p.Out, "\n")
+}
+
+// recursively print the input value
+func (p *Pretty) PrintValue(val r.Value, level int) {
 	if !val.IsValid() {
-		fmt.Printf("null")
+		io.WriteString(p.Out, p.NilString)
 		return
 	}
 
+	cur := strings.Repeat(p.Indent, level)
+	next := strings.Repeat(p.Indent, level+1)
+
 	switch val.Kind() {
 	case r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
-		fmt.Printf("%v", val.Int())
+		io.WriteString(p.Out, strconv.FormatInt(val.Int(), 10))
 
 	case r.Uint, r.Uint8, r.Uint16, r.Uint32, r.Uint64:
-		fmt.Printf("%v", val.Uint())
+		io.WriteString(p.Out, strconv.FormatUint(val.Uint(), 10))
 
 	case r.Float32, r.Float64:
-		fmt.Printf("%v", val.Float())
+		io.WriteString(p.Out, strconv.FormatFloat(val.Float(), 'f', -1, 64))
 
 	case r.String:
-		fmt.Printf("%q", val)
+		io.WriteString(p.Out, strconv.Quote(val.String()))
 
 	case r.Bool:
-		fmt.Printf("%v", val.Bool())
+		io.WriteString(p.Out, strconv.FormatBool(val.Bool()))
 
 	case r.Map:
 		l := val.Len()
 
-		fmt.Printf("{\n")
+		io.WriteString(p.Out, "{\n")
 		for i, k := range val.MapKeys() {
-			fmt.Printf("%s%q: ", spaces, k)
-			PrettyPrintValue(val.MapIndex(k), indent+1)
+			io.WriteString(p.Out, next)
+			io.WriteString(p.Out, strconv.Quote(k.String()))
+			io.WriteString(p.Out, ": ")
+			p.PrintValue(val.MapIndex(k), level+1)
 			if i < l-1 {
-				fmt.Println(",")
+				io.WriteString(p.Out, ",\n")
 			} else {
-				fmt.Println()
+				io.WriteString(p.Out, "\n")
 			}
 		}
-		fmt.Printf("%s}", spaces)
+		io.WriteString(p.Out, cur)
+		io.WriteString(p.Out, "}")
 
 	case r.Array, r.Slice:
 		l := val.Len()
 
-		fmt.Printf("[\n")
+		io.WriteString(p.Out, "[\n")
 		for i := 0; i < l; i++ {
-			fmt.Printf(spaces)
-			PrettyPrintValue(val.Index(i), indent+1)
+			io.WriteString(p.Out, next)
+			p.PrintValue(val.Index(i), level+1)
 			if i < l-1 {
-				fmt.Println(",")
+				io.WriteString(p.Out, ",\n")
 			} else {
-				fmt.Println()
+				io.WriteString(p.Out, "\n")
 			}
 		}
-		fmt.Printf("%s]", spaces)
+		io.WriteString(p.Out, cur)
+		io.WriteString(p.Out, "]")
 
 	case r.Interface, r.Ptr:
-		PrettyPrintValue(val.Elem(), indent)
+		p.PrintValue(val.Elem(), level)
 
 	default:
-		fmt.Printf("%v %v", val.Kind(), val)
+		io.WriteString(p.Out, "unsupported:")
+		io.WriteString(p.Out, val.String())
 	}
 }
