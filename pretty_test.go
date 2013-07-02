@@ -18,5 +18,7 @@ func TestPrettyPrint(test *testing.T) {
 		},
 	}
 
-	PrettyPrint(bag)
+	arry := []Bag{bag, bag, bag}
+
+	PrettyPrint(arry)
 }

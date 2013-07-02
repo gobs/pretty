@@ -8,6 +8,7 @@ import (
 
 func PrettyPrint(i interface{}) {
 	PrettyPrintValue(r.ValueOf(i), 0)
+	fmt.Println()
 }
 
 func PrettyPrintValue(val r.Value, indent int) {
@@ -41,8 +42,10 @@ func PrettyPrintValue(val r.Value, indent int) {
 		for i, k := range val.MapKeys() {
 			fmt.Printf("%s%q: ", spaces, k)
 			PrettyPrintValue(val.MapIndex(k), indent+1)
-			if i < l {
-				fmt.Printf(",\n")
+			if i < l-1 {
+				fmt.Println(",")
+			} else {
+				fmt.Println()
 			}
 		}
 		fmt.Printf("%s}", spaces)
@@ -54,8 +57,10 @@ func PrettyPrintValue(val r.Value, indent int) {
 		for i := 0; i < l; i++ {
 			fmt.Printf(spaces)
 			PrettyPrintValue(val.Index(i), indent+1)
-			if i < l {
-				fmt.Printf(",\n")
+			if i < l-1 {
+				fmt.Println(",")
+			} else {
+				fmt.Println()
 			}
 		}
 		fmt.Printf("%s]", spaces)
