@@ -21,4 +21,4 @@ http://godoc.org/github.com/gobs/pretty
       "d": false
     }
     
-		pretty.PrettyPrint(stuff)
+    pretty.PrettyPrint(stuff)
