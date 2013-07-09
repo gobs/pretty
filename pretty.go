@@ -114,6 +114,24 @@ func (p *Pretty) PrintValue(val r.Value, level int) {
 	case r.Interface, r.Ptr:
 		p.PrintValue(val.Elem(), level)
 
+	case r.Struct:
+		l := val.NumField()
+
+		io.WriteString(p.Out, "struct {\n")
+		for i := 0; i < l; i++ {
+			io.WriteString(p.Out, next)
+			io.WriteString(p.Out, val.Type().Field(i).Name)
+			io.WriteString(p.Out, ": ")
+			p.PrintValue(val.Field(i), level+1)
+			if i < l-1 {
+				io.WriteString(p.Out, ",\n")
+			} else {
+				io.WriteString(p.Out, "\n")
+			}
+		}
+		io.WriteString(p.Out, cur)
+		io.WriteString(p.Out, "}")
+
 	default:
 		io.WriteString(p.Out, "unsupported:")
 		io.WriteString(p.Out, val.String())

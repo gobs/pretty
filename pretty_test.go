@@ -4,6 +4,12 @@ import "testing"
 
 type Bag map[string]interface{}
 
+type Struct struct {
+	N int
+	S string
+	B bool
+}
+
 var (
 	ch chan string
 
@@ -21,6 +27,8 @@ var (
 	}
 
 	arry = []Bag{bag, bag, bag}
+
+	strutty = Struct{N: 42, S: "Hello", B: true}
 )
 
 func TestPrettyPrint(test *testing.T) {
@@ -29,4 +37,8 @@ func TestPrettyPrint(test *testing.T) {
 
 func TestPrettyFormat(test *testing.T) {
 	test.Log(PrettyFormat(bag))
+}
+
+func TestStruct(test *testing.T) {
+	test.Log(PrettyFormat(strutty))
 }
