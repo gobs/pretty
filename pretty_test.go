@@ -42,3 +42,19 @@ func TestPrettyFormat(test *testing.T) {
 func TestStruct(test *testing.T) {
 	test.Log(PrettyFormat(strutty))
 }
+
+func TestTabPrint(test *testing.T) {
+	tp := NewTabPrinter(8)
+
+	for i := 0; i < 33; i++ {
+		tp.Print(i)
+	}
+
+	tp.Println()
+
+	for _, v := range []string{"one", "two", "three", "four", "five", "six"} {
+		tp.Print(v)
+	}
+
+	tp.Println()
+}
