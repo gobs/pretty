@@ -122,7 +122,9 @@ func (p *Pretty) PrintValue(val r.Value, level int) {
 		} else {
 			l := val.NumField()
 
-			io.WriteString(p.Out, "struct {\n")
+      typeName := val.Type().String()
+      io.WriteString(p.Out, typeName)
+			io.WriteString(p.Out, " {\n")
 			for i := 0; i < l; i++ {
 				io.WriteString(p.Out, next)
 				io.WriteString(p.Out, val.Type().Field(i).Name)
