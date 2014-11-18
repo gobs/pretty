@@ -18,7 +18,7 @@ type TabPrinter struct {
 // max specifies the maximum number of 'words' per line
 func NewTabPrinter(max int) *TabPrinter {
 	tp := &TabPrinter{new(tabwriter.Writer), 0, max}
-	tp.w.Init(os.Stdout, 0, 8, 0, '\t', 0)
+	tp.w.Init(os.Stdout, 0, 8, 1, '\t', 0)
 
 	return tp
 }
