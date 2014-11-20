@@ -30,24 +30,33 @@ type Pretty struct {
 
 // pretty print the input value (to stdout)
 func PrettyPrint(i interface{}) {
-	PrettyPrintTo(os.Stdout, i)
+	PrettyPrintTo(os.Stdout, i, true)
 }
 
 // pretty print the input value (to a string)
 func PrettyFormat(i interface{}) string {
 	var out bytes.Buffer
-	PrettyPrintTo(&out, i)
+	PrettyPrintTo(&out, i, false)
 	return out.String()
 }
 
 // pretty print the input value (to specified writer)
-func PrettyPrintTo(out io.Writer, i interface{}) {
+func PrettyPrintTo(out io.Writer, i interface{}, nl bool) {
 	p := &Pretty{DEFAULT_INDENT, out, DEFAULT_NIL}
-	p.Print(i)
+	if nl {
+		p.Println(i)
+	} else {
+		p.Print(i)
+	}
 }
 
-// pretty print the input value
+// pretty print the input value (no newline)
 func (p *Pretty) Print(i interface{}) {
+	p.PrintValue(r.ValueOf(i), 0)
+}
+
+// pretty print the input value (newline)
+func (p *Pretty) Println(i interface{}) {
 	p.PrintValue(r.ValueOf(i), 0)
 	io.WriteString(p.Out, "\n")
 }
