@@ -1,5 +1,6 @@
 package pretty
 
+import "bytes"
 import "testing"
 
 type Bag map[string]interface{}
@@ -41,6 +42,13 @@ func TestPrettyFormat(test *testing.T) {
 
 func TestStruct(test *testing.T) {
 	test.Log(PrettyFormat(strutty))
+}
+
+func TestPretty(test *testing.T) {
+	var out bytes.Buffer
+	p := Pretty{Indent: "", Out: &out, NilString: "nil"}
+	p.Print(strutty)
+	test.Log(out.String())
 }
 
 func TestTabPrint(test *testing.T) {

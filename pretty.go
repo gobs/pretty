@@ -28,6 +28,7 @@ type Pretty struct {
 	NilString string
 }
 
+
 // pretty print the input value (to stdout)
 func PrettyPrint(i interface{}) {
 	PrettyPrintTo(os.Stdout, i)
@@ -62,6 +63,11 @@ func (p *Pretty) PrintValue(val r.Value, level int) {
 	cur := strings.Repeat(p.Indent, level)
 	next := strings.Repeat(p.Indent, level+1)
 
+	nl := "\n"
+	if len(p.Indent) == 0 {
+		nl = " "
+	}
+
 	switch val.Kind() {
 	case r.Int, r.Int8, r.Int16, r.Int32, r.Int64:
 		io.WriteString(p.Out, strconv.FormatInt(val.Int(), 10))
@@ -81,16 +87,16 @@ func (p *Pretty) PrintValue(val r.Value, level int) {
 	case r.Map:
 		l := val.Len()
 
-		io.WriteString(p.Out, "{\n")
+		io.WriteString(p.Out, "{" + nl)
 		for i, k := range val.MapKeys() {
 			io.WriteString(p.Out, next)
 			io.WriteString(p.Out, strconv.Quote(k.String()))
 			io.WriteString(p.Out, ": ")
 			p.PrintValue(val.MapIndex(k), level+1)
 			if i < l-1 {
-				io.WriteString(p.Out, ",\n")
+				io.WriteString(p.Out, "," + nl)
 			} else {
-				io.WriteString(p.Out, "\n")
+				io.WriteString(p.Out, nl)
 			}
 		}
 		io.WriteString(p.Out, cur)
@@ -99,14 +105,14 @@ func (p *Pretty) PrintValue(val r.Value, level int) {
 	case r.Array, r.Slice:
 		l := val.Len()
 
-		io.WriteString(p.Out, "[\n")
+		io.WriteString(p.Out, "[" + nl)
 		for i := 0; i < l; i++ {
 			io.WriteString(p.Out, next)
 			p.PrintValue(val.Index(i), level+1)
 			if i < l-1 {
-				io.WriteString(p.Out, ",\n")
+				io.WriteString(p.Out, "," + nl)
 			} else {
-				io.WriteString(p.Out, "\n")
+				io.WriteString(p.Out, nl)
 			}
 		}
 		io.WriteString(p.Out, cur)
@@ -122,16 +128,16 @@ func (p *Pretty) PrintValue(val r.Value, level int) {
 		} else {
 			l := val.NumField()
 
-			io.WriteString(p.Out, "struct {\n")
+			io.WriteString(p.Out, "struct {" + nl)
 			for i := 0; i < l; i++ {
 				io.WriteString(p.Out, next)
 				io.WriteString(p.Out, val.Type().Field(i).Name)
 				io.WriteString(p.Out, ": ")
 				p.PrintValue(val.Field(i), level+1)
 				if i < l-1 {
-					io.WriteString(p.Out, ",\n")
+					io.WriteString(p.Out, "," + nl)
 				} else {
-					io.WriteString(p.Out, "\n")
+					io.WriteString(p.Out, nl)
 				}
 			}
 			io.WriteString(p.Out, cur)
