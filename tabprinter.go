@@ -31,7 +31,7 @@ func (tp *TabPrinter) Print(arg interface{}) {
 		if (tp.current % tp.max) == 0 {
 			fmt.Fprintln(tp.w, "")
 			tp.w.Flush()
-                        tp.current = 0
+			tp.current = 0
 		} else {
 			fmt.Fprint(tp.w, "\t")
 		}
