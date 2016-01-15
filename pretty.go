@@ -131,27 +131,31 @@ func (p *Pretty) PrintValue(val r.Value, level int) {
 		p.PrintValue(val.Elem(), level)
 
 	case r.Struct:
-		i := val.Interface()
-		if i, ok := i.(fmt.Stringer); ok {
-			io.WriteString(p.Out, i.String())
-		} else {
-			l := val.NumField()
+                if val.CanInterface() {
+                    i := val.Interface()
+                    if i, ok := i.(fmt.Stringer); ok {
+                            io.WriteString(p.Out, i.String())
+                    } else {
+                            l := val.NumField()
 
-			io.WriteString(p.Out, "struct {" + nl)
-			for i := 0; i < l; i++ {
-				io.WriteString(p.Out, next)
-				io.WriteString(p.Out, val.Type().Field(i).Name)
-				io.WriteString(p.Out, ": ")
-				p.PrintValue(val.Field(i), level+1)
-				if i < l-1 {
-					io.WriteString(p.Out, "," + nl)
-				} else {
-					io.WriteString(p.Out, nl)
-				}
-			}
-			io.WriteString(p.Out, cur)
-			io.WriteString(p.Out, "}")
-		}
+                            io.WriteString(p.Out, "struct {" + nl)
+                            for i := 0; i < l; i++ {
+                                    io.WriteString(p.Out, next)
+                                    io.WriteString(p.Out, val.Type().Field(i).Name)
+                                    io.WriteString(p.Out, ": ")
+                                    p.PrintValue(val.Field(i), level+1)
+                                    if i < l-1 {
+                                            io.WriteString(p.Out, "," + nl)
+                                    } else {
+                                            io.WriteString(p.Out, nl)
+                                    }
+                            }
+                            io.WriteString(p.Out, cur)
+                            io.WriteString(p.Out, "}")
+                    }
+                } else {
+                    io.WriteString(p.Out, "protected")
+                }
 
 	default:
 		io.WriteString(p.Out, "unsupported:")
