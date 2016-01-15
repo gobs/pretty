@@ -26,8 +26,9 @@ type Pretty struct {
 	Out io.Writer
 	// string for nil
 	NilString string
+	// compact empty array and struct
+	Compact bool
 }
-
 
 // pretty print the input value (to stdout)
 func PrettyPrint(i interface{}) {
@@ -43,7 +44,7 @@ func PrettyFormat(i interface{}) string {
 
 // pretty print the input value (to specified writer)
 func PrettyPrintTo(out io.Writer, i interface{}, nl bool) {
-	p := &Pretty{DEFAULT_INDENT, out, DEFAULT_NIL}
+	p := &Pretty{Indent: DEFAULT_INDENT, Out: out, NilString: DEFAULT_NIL}
 	if nl {
 		p.Println(i)
 	} else {
@@ -96,14 +97,14 @@ func (p *Pretty) PrintValue(val r.Value, level int) {
 	case r.Map:
 		l := val.Len()
 
-		io.WriteString(p.Out, "{" + nl)
+		io.WriteString(p.Out, "{"+nl)
 		for i, k := range val.MapKeys() {
 			io.WriteString(p.Out, next)
 			io.WriteString(p.Out, strconv.Quote(k.String()))
 			io.WriteString(p.Out, ": ")
 			p.PrintValue(val.MapIndex(k), level+1)
 			if i < l-1 {
-				io.WriteString(p.Out, "," + nl)
+				io.WriteString(p.Out, ","+nl)
 			} else {
 				io.WriteString(p.Out, nl)
 			}
@@ -114,18 +115,22 @@ func (p *Pretty) PrintValue(val r.Value, level int) {
 	case r.Array, r.Slice:
 		l := val.Len()
 
-		io.WriteString(p.Out, "[" + nl)
-		for i := 0; i < l; i++ {
-			io.WriteString(p.Out, next)
-			p.PrintValue(val.Index(i), level+1)
-			if i < l-1 {
-				io.WriteString(p.Out, "," + nl)
-			} else {
-				io.WriteString(p.Out, nl)
+		if p.Compact && l == 0 {
+			io.WriteString(p.Out, "[]")
+		} else {
+			io.WriteString(p.Out, "["+nl)
+			for i := 0; i < l; i++ {
+				io.WriteString(p.Out, next)
+				p.PrintValue(val.Index(i), level+1)
+				if i < l-1 {
+					io.WriteString(p.Out, ","+nl)
+				} else {
+					io.WriteString(p.Out, nl)
+				}
 			}
+			io.WriteString(p.Out, cur)
+			io.WriteString(p.Out, "]")
 		}
-		io.WriteString(p.Out, cur)
-		io.WriteString(p.Out, "]")
 
 	case r.Interface, r.Ptr:
 		p.PrintValue(val.Elem(), level)
@@ -137,20 +142,30 @@ func (p *Pretty) PrintValue(val r.Value, level int) {
 		} else {
 			l := val.NumField()
 
-			io.WriteString(p.Out, "struct {" + nl)
-			for i := 0; i < l; i++ {
-				io.WriteString(p.Out, next)
-				io.WriteString(p.Out, val.Type().Field(i).Name)
-				io.WriteString(p.Out, ": ")
-				p.PrintValue(val.Field(i), level+1)
-				if i < l-1 {
-					io.WriteString(p.Out, "," + nl)
-				} else {
-					io.WriteString(p.Out, nl)
-				}
+			sOpen := "struct {"
+
+			if p.Compact {
+				sOpen = "{"
 			}
-			io.WriteString(p.Out, cur)
-			io.WriteString(p.Out, "}")
+
+			if p.Compact && l == 0 {
+				io.WriteString(p.Out, "{}")
+			} else {
+				io.WriteString(p.Out, sOpen+nl)
+				for i := 0; i < l; i++ {
+					io.WriteString(p.Out, next)
+					io.WriteString(p.Out, val.Type().Field(i).Name)
+					io.WriteString(p.Out, ": ")
+					p.PrintValue(val.Field(i), level+1)
+					if i < l-1 {
+						io.WriteString(p.Out, ","+nl)
+					} else {
+						io.WriteString(p.Out, nl)
+					}
+				}
+				io.WriteString(p.Out, cur)
+				io.WriteString(p.Out, "}")
+			}
 		}
 
 	default:
