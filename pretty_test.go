@@ -9,10 +9,26 @@ type Struct struct {
 	N int
 	S string
 	B bool
+	A []int
+	Z []int
 }
 
 var (
 	ch chan string
+
+	s = struct {
+		n int
+		s string
+	}{
+		42,
+		"hello world",
+	}
+
+	x = struct{}{}
+
+	arry = []Bag{bag, bag, bag}
+
+	strutty = Struct{N: 42, S: "Hello", B: true, A: []int{1, 2, 3}}
 
 	bag = Bag{
 		"a": 1,
@@ -24,12 +40,11 @@ var (
 			"e2": []int{1, 2, 3, 4},
 			"e3": nil,
 		},
+		"s":   s,
+		"x":   x,
+		"z":   []int{},
 		"bad": ch,
 	}
-
-	arry = []Bag{bag, bag, bag}
-
-	strutty = Struct{N: 42, S: "Hello", B: true}
 )
 
 func TestPrettyPrint(test *testing.T) {
@@ -47,6 +62,13 @@ func TestStruct(test *testing.T) {
 func TestPretty(test *testing.T) {
 	var out bytes.Buffer
 	p := Pretty{Indent: "", Out: &out, NilString: "nil"}
+	p.Print(strutty)
+	test.Log(out.String())
+}
+
+func TestPrettyCompact(test *testing.T) {
+	var out bytes.Buffer
+	p := Pretty{Indent: "", Out: &out, NilString: "nil", Compact: true}
 	p.Print(strutty)
 	test.Log(out.String())
 }
