@@ -45,7 +45,7 @@ func (tp *TabPrinter) Print(arg interface{}) {
 //
 // terminate current line and print - call this after all words have been printed
 func (tp *TabPrinter) Println() {
-	if tp.current > 0 && (tp.current%tp.max) != 0 {
+	if tp.current > 0 {
 		fmt.Fprintln(tp.w, "")
 		tp.w.Flush()
 	}
