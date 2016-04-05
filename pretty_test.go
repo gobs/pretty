@@ -73,7 +73,7 @@ func TestPrettyCompact(test *testing.T) {
 	test.Log(out.String())
 }
 
-func TestTabPrint(test *testing.T) {
+func ExampleTabPrint() {
 	tp := NewTabPrinter(8)
 
 	for i := 0; i < 33; i++ {
@@ -87,4 +87,27 @@ func TestTabPrint(test *testing.T) {
 	}
 
 	tp.Println()
+
+	// Output:
+	// 0	1	2	3	4	5	6	7
+	// 8	9	10	11	12	13	14	15
+	// 16	17	18	19	20	21	22	23
+	// 24	25	26	27	28	29	30	31
+	// 32
+	// one	two	three	four	five	six
+}
+
+func ExampleTabPrintTwoFullLines() {
+	tp := NewTabPrinter(4)
+
+	for _, v := range []string{"one", "two", "three", "four", "five", "six", "seven", "eight"} {
+		tp.Print(v)
+	}
+
+	tp.Println()
+
+	// Output:
+	// one	two	three	four
+	// five	six	seven	eight
+	//
 }
