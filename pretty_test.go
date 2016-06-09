@@ -39,6 +39,7 @@ var (
 			"e1": "here",
 			"e2": []int{1, 2, 3, 4},
 			"e3": nil,
+                        "e4": s,
 		},
 		"s":   s,
 		"x":   x,
@@ -70,6 +71,13 @@ func TestPrettyCompact(test *testing.T) {
 	var out bytes.Buffer
 	p := Pretty{Indent: "", Out: &out, NilString: "nil", Compact: true}
 	p.Print(strutty)
+	test.Log(out.String())
+}
+
+func TestPrettyLevel(test *testing.T) {
+	var out bytes.Buffer
+	p := Pretty{Indent: "", Out: &out, NilString: "nil", Compact: true, MaxLevel: 2}
+	p.Print(bag)
 	test.Log(out.String())
 }
 

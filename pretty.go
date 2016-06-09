@@ -28,6 +28,8 @@ type Pretty struct {
 	NilString string
 	// compact empty array and struct
 	Compact bool
+	// Maximum nesting level
+	MaxLevel int
 }
 
 // pretty print the input value (to stdout)
@@ -76,6 +78,11 @@ func (p *Pretty) PrintValue(val r.Value, level int) {
 	nl := "\n"
 	if len(p.Indent) == 0 {
 		nl = " "
+	}
+
+	if p.MaxLevel > 0 && level >= p.MaxLevel {
+		io.WriteString(p.Out, val.String())
+		return
 	}
 
 	switch val.Kind() {
