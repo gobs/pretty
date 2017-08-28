@@ -39,7 +39,7 @@ var (
 			"e1": "here",
 			"e2": []int{1, 2, 3, 4},
 			"e3": nil,
-                        "e4": s,
+			"e4": s,
 		},
 		"s":   s,
 		"x":   x,
@@ -118,4 +118,23 @@ func ExampleTabPrintTwoFullLines() {
 	// one	two	three	four
 	// five	six	seven	eight
 	//
+}
+
+func ExampleTabPrintWider() {
+	tp := NewTabPrinter(2)
+	tp.TabWidth(10)
+
+	for _, v := range []string{"one", "two", "three", "four", "five", "six", "seven", "eight", "larger", "largest", "even more", "enough"} {
+		tp.Print(v)
+	}
+
+	tp.Println()
+
+	// Output:
+	// one       two
+	// three     four
+	// five      six
+	// seven     eight
+	// larger    largest
+	// even more enough
 }

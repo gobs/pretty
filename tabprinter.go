@@ -23,6 +23,12 @@ func NewTabPrinter(max int) *TabPrinter {
 	return tp
 }
 
+// update tab width (minimal space between words)
+//
+func (tp *TabPrinter) TabWidth(n int) {
+	tp.w.Init(os.Stdout, n, 0, 1, ' ', 0)
+}
+
 // print a 'word'
 //
 // when the maximum number of words per lines is reached, this will print the formatted line
